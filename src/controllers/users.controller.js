@@ -1,8 +1,46 @@
 const User = require("../models/users.model");
-const mongoose = require("mongoose");
-const Department = require("../models/department.model");
+const { generateOTPCode } = require("../utils/index");
 
 const userCtrl = {
+  checkUser: async (req, res) => {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        const otpCode = generateOTPCode();
+        const newUser = new User({
+          email,
+          otp: {
+            otpCode,
+            created_at: new Date(),
+          },
+        });
+        await newUser.save();
+        return res
+          .status(200)
+          .json({ success: true, isVerified: false, otpCode });
+      }
+      if (!user.isVerified) {
+        const otpCode = generateOTPCode();
+        await User.findOneAndUpdate(
+          { email },
+          {
+            otp: {
+              otpCode,
+              created_at: new Date(),
+            },
+          }
+        );
+        return res
+          .status(200)
+          .json({ success: true, isVerified: false, otpCode });
+      }
+      return res.status(200).json({ success: true, isVerified: true });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+  },
   createUser: async (req, res) => {
     const {
       email,
