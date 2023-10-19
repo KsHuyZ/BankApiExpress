@@ -28,6 +28,10 @@ const userModel = Schema(
         created_at: String,
       },
     },
+    cardNumber: {
+      type: Number,
+      unique: true
+    },
     isVerified: {
       type: Boolean,
       default: false,

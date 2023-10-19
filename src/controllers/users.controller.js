@@ -80,10 +80,21 @@ const userCtrl = {
       const user = await User.findOne({ email });
       if (!user) throw new Error("not_exist");
       if (!user.isVerified) throw new Error("not_verified");
+      let cardNumber = null;
+      while (!cardNumber) {
+        const number = generateRandomNumber(16);
+        const userCard = await User.findOne({ number });
+
+        if (!userCard) {
+          cardNumber = number;
+        }
+      }
+
       user.firstName = firstName;
       user.lastName = lastName;
       user.password = hashPassword(password);
       user.phoneNumber = phoneNumber;
+      user.cardNumber = cardNumber;
       await user.save();
       return res.status(200).json({ success: true });
     } catch (error) {
