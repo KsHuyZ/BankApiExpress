@@ -23,4 +23,5 @@ app.listen(port, () => {
 });
 
 const URI = "mongodb+srv://kshuyz0055:kshuyz0055@cluster0.vnwhw.mongodb.net/bank";
+// const URI = "mongodb://localhost:27017/bank";
 connectDB(URI);

@@ -1,9 +1,16 @@
 const User = require("../models/users.model");
-const { generateOTPCode } = require("../utils/index");
-
+const {
+  generateOTPCode,
+  sendMail,
+  handleTransaction,
+  hashPassword,
+  comparePassword,
+  generateToken,
+} = require("../utils/index");
+const { otpForm } = require("../constant/index");
 const userCtrl = {
   checkUser: async (req, res) => {
-    const { email } = req.body;
+    const { email } = req.params;
     try {
       const user = await User.findOne({ email });
       if (!user) {
@@ -15,10 +22,9 @@ const userCtrl = {
             created_at: new Date(),
           },
         });
-        await newUser.save();
-        return res
-          .status(200)
-          .json({ success: true, isVerified: false, otpCode });
+        newUser.save();
+        sendMail(email, `Welcome to Bank App`, otpForm(otpCode));
+        return res.status(200).json({ success: true, isVerified: false });
       }
       if (!user.isVerified) {
         const otpCode = generateOTPCode();
@@ -31,149 +37,83 @@ const userCtrl = {
             },
           }
         );
+        sendMail(email, `Welcome to Bank App`, otpForm(otpCode));
+        return res.status(200).json({ success: true, isVerified: false });
+      }
+      if (!user.password) {
         return res
           .status(200)
-          .json({ success: true, isVerified: false, otpCode });
+          .json({ success: true, isVerified: true, password: false });
       }
-      return res.status(200).json({ success: true, isVerified: true });
+      return res
+        .status(200)
+        .json({ success: true, isVerified: true, password: true });
     } catch (error) {
-      console.log(error.message);
       return res.status(400).json({ success: false, message: error.message });
     }
   },
-  createUser: async (req, res) => {
-    const {
-      email,
-      password,
-      name,
-      avatar,
-      role,
-      position,
-      gender,
-      address,
-      birthday,
-      idDepartment,
-    } = req.body;
+  checkOTP: async (req, res) => {
+    const { email, otp: otpClient } = req.body;
     try {
-      const existEmail = await User.findOne({ email: email });
-      if (existEmail) {
-        return res.status(400).json({ success: true, msg: "Has exits" });
-      } else {
-        const user = new User({
-          email,
-          name: name,
-          password,
-          avatar: avatar,
-          role,
-          gender,
-          position,
-          birthday,
-          address,
-          idDepartment,
-        });
-        await user.save();
-
-        return res.status(200).json({ success: true, msg: "success" });
+      const user = await User.findOne({ email });
+      const currentTime = new Date();
+      const otp = user.otp;
+      const { otpCode, created_at: createdAt } = otp;
+      if (otpClient !== otpCode) {
+        throw new Error("wrong_otp");
       }
+      if (new Date(currentTime) - new Date(createdAt) > 180000) {
+        throw new Error("otp_expired");
+      }
+      user.isVerified = true;
+      await user.save();
+      return res.status(200).json({ success: true });
     } catch (error) {
-      console.log("error: ", error);
+      return res.status(400).json({ success: false, message: error.message });
     }
   },
-  updateUser: async (req, res) => {
-    const {
-      email,
-      password,
-      name,
-      avatar,
-      role,
-      position,
-      gender,
-      address,
-      birthday,
-      idDepartment,
-    } = req.body;
-
+  register: async (req, res) => {
+    const { email, firstName, lastName, password, phoneNumber } = req.body;
     try {
-      const user = await User.findOneAndUpdate(
-        {
-          _id: req.params.id,
-        },
-        {
-          email,
-          password,
-          name,
-          avatar,
-          role,
-          position,
-          gender,
-          address,
-          birthday,
-          idDepartment,
-        }
-      );
-
-      return res.status(200).json({ success: true, msg: "success" });
+      if (!firstName && !lastName && !password && !phoneNumber)
+        throw new Error("Please enter all field");
+      const user = await User.findOne({ email });
+      if (!user) throw new Error("not_exist");
+      if (!user.isVerified) throw new Error("not_verified");
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.password = hashPassword(password);
+      user.phoneNumber = phoneNumber;
+      await user.save();
+      return res.status(200).json({ success: true });
     } catch (error) {
-      console.log("error: ", error);
+      return res.status(400).json({ success: false, message: error.message });
     }
   },
   signIn: async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password: passwordClient } = req.body;
     try {
-      const existEmail = await User.findOne({ email: email });
-      if (!existEmail) {
-        return res.status(400).json({ success: false, msg: 1 });
-      }
-      const user = await User.findOne({ email, password });
+      const user = await User.findOne({ email });
       if (!user) {
-        return res.status(400).json({ success: false, msg: 2 });
+        throw new Error("not_exist");
       }
-      return res.status(200).json({ success: true, user });
+      const hashPassword = user.password;
+      const result = comparePassword(passwordClient, hashPassword);
+      if (!result) throw new Error("wrong_password");
+      const token = generateToken({ id: user._id });
+      const newUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id,
+        balance: user.balance,
+        phoneNumber: user.phoneNumber,
+      };
+      return res.status(200).json({ success: true, user: newUser, token });
     } catch (error) {
-      console.log(error);
+      return res.status(400).json({ success: false, message: error.message });
     }
   },
-  allUser: async (req, res) => {
-    try {
-      const users = await User.find().populate("idDepartment");
-      return res.status(200).json(users);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  },
-  showUserById: async (req, res) => {
-    try {
-      const data = await User.findOne(
-        { _id: req.params.id },
-        "email name avatar role gender address position password birthday"
-      )
-        .populate("idDepartment")
-        .exec();
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  },
-  searchByEmail: async (req, res) => {
-    try {
-      const data = await User.find(
-        {
-          email: { $regex: req.params.q },
-        },
-        "email name avatar role gender address"
-      ).exec();
 
-      return res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  },
   removeUser: async (req, res) => {
     const id = req.params.id;
     try {
