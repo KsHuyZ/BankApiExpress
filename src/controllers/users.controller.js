@@ -1,6 +1,6 @@
 const User = require("../models/users.model");
 const {
-  generateOTPCode,
+  generateRandomNumber,
   sendMail,
   handleTransaction,
   hashPassword,
@@ -14,7 +14,7 @@ const userCtrl = {
     try {
       const user = await User.findOne({ email });
       if (!user) {
-        const otpCode = generateOTPCode();
+        const otpCode = generateRandomNumber(4);
         const newUser = new User({
           email,
           otp: {
@@ -27,7 +27,7 @@ const userCtrl = {
         return res.status(200).json({ success: true, isVerified: false });
       }
       if (!user.isVerified) {
-        const otpCode = generateOTPCode();
+        const otpCode = generateRandomNumber(4);
         await User.findOneAndUpdate(
           { email },
           {

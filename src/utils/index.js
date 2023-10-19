@@ -6,9 +6,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;
 
-exports.generateOTPCode = () => {
-  const randomNumber = Math.random() * 10000;
-  return randomNumber.toFixed();
+exports.generateRandomNumber = (numDigits) => {
+  if (numDigits <= 0) {
+    throw new Error("Số chữ số phải lớn hơn 0.");
+  }
+
+  const min = Math.pow(10, numDigits - 1);
+  const max = Math.pow(10, numDigits) - 1;
+
+  return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 exports.connectDB = async (URI) => {
@@ -75,7 +81,7 @@ exports.comparePassword = (password, hashPassword) => {
   return bcrypt.compareSync(password, hashPassword);
 };
 exports.generateToken = (user) => {
-  const accessToken = jwt.sign(user, jwtSecret, { expiresIn: "3d" });
+  const accessToken = jwt.sign(user, jwtSecret, { expiresIn: 60 * 15 });
   const refreshToken = jwt.sign(user, jwtSecret);
   return accessToken;
 };
