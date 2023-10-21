@@ -45,9 +45,16 @@ const userCtrl = {
           .status(200)
           .json({ success: true, isVerified: true, password: false });
       }
+      const newUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id,
+        balance: user.balance,
+        phoneNumber: user.phoneNumber,
+      };
       return res
         .status(200)
-        .json({ success: true, isVerified: true, password: true });
+        .json({ success: true, isVerified: true, password: true, user: newUser });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -83,7 +90,7 @@ const userCtrl = {
       let cardNumber = null;
       while (!cardNumber) {
         const number = generateRandomNumber(16);
-        const userCard = await User.findOne({cardNumber:number });
+        const userCard = await User.findOne({ cardNumber: number });
 
         if (!userCard) {
           cardNumber = number;
@@ -95,8 +102,9 @@ const userCtrl = {
       user.password = hashPassword(password);
       user.phoneNumber = phoneNumber;
       user.cardNumber = cardNumber;
+      const token = generateToken({ id: user._id });
       await user.save();
-      return res.status(200).json({ success: true });
+      return res.status(200).json({ success: true, token });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -128,20 +136,19 @@ const userCtrl = {
     const { email } = req.body;
     try {
       const user = await User.findOne({ email });
-      if(!user) throw new Error("not_exist")
+      if (!user) throw new Error("not_exist");
       const otpCode = generateRandomNumber(4);
       user.otp = {
         otpCode,
-        created_at: new Date()
-      }
-      await user.save()
+        created_at: new Date(),
+      };
+      await user.save();
       sendMail(email, `Welcome to Bank App`, otpForm(otpCode));
-      return res.status(200).json({success: true})
-
+      return res.status(200).json({ success: true });
     } catch (error) {
-      return res.status(400).json({success: false , message: error.message})
+      return res.status(400).json({ success: false, message: error.message });
     }
-  }
+  },
 };
 
 module.exports = userCtrl;
