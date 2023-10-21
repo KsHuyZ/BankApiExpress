@@ -124,6 +124,24 @@ const userCtrl = {
       return res.status(400).json({ success: false, message: error.message });
     }
   },
+  refreshOTP: async (req, res) => {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if(!user) throw new Error("not_exist")
+      const otpCode = generateRandomNumber(4);
+      user.otp = {
+        otpCode,
+        created_at: new Date()
+      }
+      await user.save()
+      sendMail(email, `Welcome to Bank App`, otpForm(otpCode));
+      return res.status(200).json({success: true})
+
+    } catch (error) {
+      return res.status(400).json({success: false , message: error.message})
+    }
+  }
 };
 
 module.exports = userCtrl;
