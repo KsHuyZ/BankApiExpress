@@ -131,8 +131,9 @@ const userCtrl = {
         _id: user._id,
         balance: user.balance,
         phoneNumber: user.phoneNumber,
+        token
       };
-      return res.status(200).json({ success: true, user: newUser, token });
+      return res.status(200).json({ success: true, user: newUser });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
