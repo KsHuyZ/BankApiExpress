@@ -51,15 +51,15 @@ const userCtrl = {
         _id: user._id,
         phoneNumber: user.phoneNumber,
         email: user.email,
+        balance: user.balance,
+        cardNumber: user.cardNumber,
       };
-      return res
-        .status(200)
-        .json({
-          success: true,
-          isVerified: true,
-          password: true,
-          user: newUser,
-        });
+      return res.status(200).json({
+        success: true,
+        isVerified: true,
+        password: true,
+        user: newUser,
+      });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -108,8 +108,17 @@ const userCtrl = {
       user.phoneNumber = phoneNumber;
       user.cardNumber = cardNumber;
       const token = generateToken({ id: user._id });
+      const newUser = {
+        firstName,
+        lastName,
+        _id: user._id,
+        phoneNumber,
+        email,
+        cardNumber,
+        token,
+      };
       await user.save();
-      return res.status(200).json({ success: true, token });
+      return res.status(200).json({ success: true, user: newUser });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -125,15 +134,7 @@ const userCtrl = {
       const result = comparePassword(passwordClient, hashPassword);
       if (!result) throw new Error("wrong_password");
       const token = generateToken({ id: user._id });
-      const newUser = {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        _id: user._id,
-        balance: user.balance,
-        phoneNumber: user.phoneNumber,
-        token
-      };
-      return res.status(200).json({ success: true, user: newUser });
+      return res.status(200).json({ success: true, token });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
