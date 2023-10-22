@@ -49,12 +49,17 @@ const userCtrl = {
         firstName: user.firstName,
         lastName: user.lastName,
         _id: user._id,
-        balance: user.balance,
         phoneNumber: user.phoneNumber,
+        email: user.email,
       };
       return res
         .status(200)
-        .json({ success: true, isVerified: true, password: true, user: newUser });
+        .json({
+          success: true,
+          isVerified: true,
+          password: true,
+          user: newUser,
+        });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
