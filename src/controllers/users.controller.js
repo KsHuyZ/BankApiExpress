@@ -136,9 +136,17 @@ const userCtrl = {
       const result = comparePassword(passwordClient, hashPassword);
       if (!result) throw new Error("wrong_password");
       const accessToken = generateAccessToken({ id: user._id });
-      return res
-        .status(200)
-        .json({ success: true, accessToken, refreshToken: user.token });
+      const newUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        cardNumber: user.cardNumber,
+        accessToken,
+        refreshToken: user.token,
+      };
+      return res.status(200).json({ success: true, user: newUser });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
