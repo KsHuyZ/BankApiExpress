@@ -5,7 +5,7 @@ const {
   handleTransaction,
   hashPassword,
   comparePassword,
-  generateToken,
+  generateAccessToken,
 } = require("../utils/index");
 const { otpForm } = require("../constant/index");
 const userCtrl = {
@@ -101,13 +101,14 @@ const userCtrl = {
           cardNumber = number;
         }
       }
-
+      const accessToken = generateAccessToken({ id: user._id });
+      const refreshToken = generateRefreshToken({ id: user._id });
       user.firstName = firstName;
       user.lastName = lastName;
       user.password = hashPassword(password);
       user.phoneNumber = phoneNumber;
       user.cardNumber = cardNumber;
-      const token = generateToken({ id: user._id });
+      user.token = refreshToken;
       const newUser = {
         firstName,
         lastName,
@@ -115,7 +116,8 @@ const userCtrl = {
         phoneNumber,
         email,
         cardNumber,
-        token,
+        accessToken,
+        refreshToken,
       };
       await user.save();
       return res.status(200).json({ success: true, user: newUser });
@@ -133,8 +135,10 @@ const userCtrl = {
       const hashPassword = user.password;
       const result = comparePassword(passwordClient, hashPassword);
       if (!result) throw new Error("wrong_password");
-      const token = generateToken({ id: user._id });
-      return res.status(200).json({ success: true, token });
+      const accessToken = generateAccessToken({ id: user._id });
+      return res
+        .status(200)
+        .json({ success: true, accessToken, refreshToken: user.refreshToken });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }

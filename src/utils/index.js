@@ -80,11 +80,15 @@ exports.hashPassword = (password) => {
 exports.comparePassword = (password, hashPassword) => {
   return bcrypt.compareSync(password, hashPassword);
 };
-exports.generateToken = (user) => {
-  const accessToken = jwt.sign(user, jwtSecret, { expiresIn: 60 * 15 });
-  const refreshToken = jwt.sign(user, jwtSecret);
-  return accessToken;
+exports.generateAccessToken = (user) => {
+  const toke = jwt.sign(user, jwtSecret, { expiresIn: 60 * 15 });
+  return toke
 };
+exports.generateRefreshToken = (user) => {
+  const token = jwt.sign(user, jwtSecret);
+  return token
+};
+
 
 exports.decodeTokenWithExp = (token) => {
   try {
