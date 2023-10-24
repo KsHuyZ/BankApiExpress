@@ -18,6 +18,7 @@ const userCtrl = {
         .status(200)
         .json({ success: true, name: `${user.firstName} ${user.lastName}` });
     } catch (error) {
+      console.log(error.message);
       return res.status(400).json({ success: false, message: error.message });
     }
   },
