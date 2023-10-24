@@ -88,6 +88,14 @@ exports.generateRefreshToken = (user) => {
   const token = jwt.sign(user, jwtSecret);
   return token
 };
+exports.decodeTokenWithExp = (token) => {
+  try {
+    return jwt.verify(token, jwtSecret);
+  } catch (error) {
+    console.log(`Error in decode access token: ${error}`);
+    return null;
+  }
+};
 
 
 exports.decodeTokenWithExp = (token) => {

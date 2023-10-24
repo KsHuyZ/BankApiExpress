@@ -6,6 +6,8 @@ const cors = require("cors");
 const app = express();
 
 const usersRouter = require("./src/routes/users.routes");
+const authRouter = require("./src/routes/auth.routes");
+const authMiddleware = require("./src/middleware/auth.middleware");
 const { connectDB } = require("./src/utils/index");
 
 app.use(cors());
@@ -16,12 +18,14 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/users", usersRouter);
+app.use("/users", authMiddleware, usersRouter);
+app.use("/auth", authRouter);
 app.get("/", (req, res) => res.status(200).send("Hahhahahah"));
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });
 
-const URI = "mongodb+srv://kshuyz0055:kshuyz0055@cluster0.vnwhw.mongodb.net/bank";
+const URI =
+  "mongodb+srv://kshuyz0055:kshuyz0055@cluster0.vnwhw.mongodb.net/bank";
 // const URI = "mongodb://localhost:27017/bank";
 connectDB(URI);
