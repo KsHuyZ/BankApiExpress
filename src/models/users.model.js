@@ -37,6 +37,9 @@ const userModel = Schema(
       default: false,
       required: true,
     },
+    token: {
+      type: String,
+    }
   },
 
   { timestamps: true }

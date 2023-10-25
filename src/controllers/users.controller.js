@@ -1,13 +1,4 @@
 const User = require("../models/users.model");
-const {
-  generateRandomNumber,
-  sendMail,
-  handleTransaction,
-  hashPassword,
-  comparePassword,
-  generateAccessToken,
-} = require("../utils/index");
-const { otpForm } = require("../constant/index");
 const userCtrl = {
   getUserNamebyCardNumber: async (req, res) => {
     const { cardNumber } = req.params;
