@@ -1,3 +1,4 @@
+const {otpForm} = require('../constant/index')
 const User = require("../models/users.model");
 const {
   generateRandomNumber,
@@ -60,6 +61,7 @@ const authCtrl = {
         user: newUser,
       });
     } catch (error) {
+      console.log(error.message)
       return res.status(400).json({ success: false, message: error.message });
     }
   },
