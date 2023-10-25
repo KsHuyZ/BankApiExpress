@@ -115,12 +115,12 @@ const authCtrl = {
         phoneNumber,
         email,
         cardNumber,
-        accessToken,
-        refreshToken,
         balance: 0,
       };
       await user.save();
-      return res.status(200).json({ success: true, user: newUser });
+      return res
+        .status(200)
+        .json({ success: true, user: newUser, accessToken, refreshToken });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -144,10 +144,13 @@ const authCtrl = {
         email: user.email,
         cardNumber: user.cardNumber,
         balance: user.balance,
+      };
+      return res.status(200).json({
+        success: true,
+        user: newUser,
         accessToken,
         refreshToken: user.token,
-      };
-      return res.status(200).json({ success: true, user: newUser });
+      });
     } catch (error) {
       return res.status(400).json({ success: false, message: error.message });
     }
