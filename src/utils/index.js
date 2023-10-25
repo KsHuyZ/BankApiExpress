@@ -81,12 +81,12 @@ exports.comparePassword = (password, hashPassword) => {
   return bcrypt.compareSync(password, hashPassword);
 };
 exports.generateAccessToken = (user) => {
-  const toke = jwt.sign(user, jwtSecret, { expiresIn: 60 * 3 });
-  return toke
+  const token = jwt.sign(user, jwtSecret, { expiresIn: 60 * 3 });
+  return token;
 };
 exports.generateRefreshToken = (user) => {
   const token = jwt.sign(user, jwtSecret);
-  return token
+  return token;
 };
 exports.decodeTokenWithExp = (token) => {
   try {
@@ -96,7 +96,6 @@ exports.decodeTokenWithExp = (token) => {
     return null;
   }
 };
-
 
 exports.decodeTokenWithExp = (token) => {
   try {
