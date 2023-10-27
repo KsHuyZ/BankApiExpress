@@ -24,11 +24,13 @@ const transactionCtrl = {
         await fromUser.save();
         receivedUser.balance = receivedUser.balance + Number(amount);
         await receivedUser.save();
+        const time = getCurrentTime();
         const resultTrans = await transactionCtrl.createTransaction(
           fromUserId,
           receivedUser._id.toString(),
           amount,
-          message
+          message,
+          time
         );
         if (!resultTrans.success) throw new Error(resultTrans.message);
         const resultHis1 = await createHistory(
@@ -36,7 +38,8 @@ const transactionCtrl = {
           fromUserId,
           amount,
           fromUser.balance,
-          SEND
+          SEND,
+          time
         );
         if (!resultHis1.success) throw new Error(resultHis1.message);
         const resultHis2 = await createHistory(
@@ -44,13 +47,15 @@ const transactionCtrl = {
           receivedUser._id,
           amount,
           receivedUser.balance,
-          RECEIVED
+          RECEIVED,
+          time
         );
         if (!resultHis2.success) throw new Error(resultHis1.message);
         socket.emit("update_balance", {
           newBalance: fromUser.balance,
           success: true,
-          amount
+          amount,
+          time
         });
         io.to(receivedUser._id.toString()).emit(
           "receive_amount",
@@ -62,13 +67,13 @@ const transactionCtrl = {
       socket.emit("update_balance", {
         success: false,
       });
-      console.log(error.message)
+      console.log(error.message);
       return { success: false, message: error.message };
     } finally {
       session.endSession();
     }
   },
-  createTransaction: async (fromUser, toUser, amount, message) => {
+  createTransaction: async (fromUser, toUser, amount, message, time) => {
     console.log(fromUser, toUser, amount, message);
     try {
       const transaction = new Transaction({
@@ -76,6 +81,7 @@ const transactionCtrl = {
         toUser,
         amount,
         message,
+        time,
       });
       await transaction.save();
       return { success: true, id: transaction._id };

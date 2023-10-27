@@ -29,6 +29,10 @@ const transactionSchema = Schema(
       enum: [RECEIVED, SEND],
       required: true,
     },
+    time: {
+      type: String,
+      required: true,
+    },
   },
 
   { timestamps: true }

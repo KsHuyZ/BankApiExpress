@@ -4,6 +4,8 @@ const mailConfig = require("../config/mail");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const dayjs = require("dayjs");
+require("dayjs/locale/vi")
 const jwtSecret = process.env.JWT_SECRET;
 
 exports.generateRandomNumber = (numDigits) => {
@@ -104,4 +106,7 @@ exports.decodeTokenWithExp = (token) => {
     console.log(`Error in decode access token: ${error}`);
     return null;
   }
+};
+exports.getCurrentTime = () => {
+  dayjs().format(" 'HH:MM' - YYYY/MM/DD");
 };

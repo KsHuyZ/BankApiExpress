@@ -5,7 +5,8 @@ const historyCtrl = {
     userId,
     ammount,
     balanceAfter,
-    transactionType
+    transactionType,
+    time
   ) => {
     const history = new History({
       transactionId,
@@ -13,6 +14,7 @@ const historyCtrl = {
       ammount,
       balanceAfter,
       transactionType,
+      time
     });
     try {
       await history.save();

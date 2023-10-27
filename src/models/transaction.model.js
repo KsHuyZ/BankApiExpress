@@ -18,6 +18,10 @@ const transactionSchema = Schema(
     message: {
       type: String,
     },
+    time: {
+      type:String,
+      required: true,
+    }
   },
 
   { timestamps: true }
