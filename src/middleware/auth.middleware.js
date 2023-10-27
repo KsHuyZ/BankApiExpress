@@ -6,6 +6,7 @@ module.exports = (req, res, next) => {
         const authorization = req.headers.authorization;
         if (!authorization) return res.status(403).send("Access Denied");
         const accessToken = authorization.split(" ")[1];
+        console.log(accessToken)
         const decoded = decodeTokenWithExp(accessToken);
         if (!decoded)
         return res.status(401).json({ success: false, message: "Invalid Token" });

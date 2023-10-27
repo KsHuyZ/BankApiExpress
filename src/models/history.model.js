@@ -1,13 +1,17 @@
 const { Schema, model } = require("mongoose");
+const { transactionType } = require("../constant/index");
+
+const { RECEIVED, SEND } = transactionType;
+
 const transactionSchema = Schema(
   {
     transactionId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "transaction",
       required: true,
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
@@ -22,6 +26,7 @@ const transactionSchema = Schema(
     // enum: received/sent
     transactionType: {
       type: String,
+      enum: [RECEIVED, SEND],
       required: true,
     },
   },

@@ -3,12 +3,20 @@ const morgan = require("morgan");
 const path = require("path");
 require("dotenv").config();
 const cors = require("cors");
-const app = express();
+const { Server } = require("socket.io");
+const http = require("http");
 
 const usersRouter = require("./src/routes/users.routes");
 const authRouter = require("./src/routes/auth.routes");
+const {transfer} = require("./src/controllers/transaction.controller");
 const authMiddleware = require("./src/middleware/auth.middleware");
 const { connectDB } = require("./src/utils/index");
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  connectionStateRecovery: {},
+});
 
 app.use(cors());
 app.options("*", cors());
@@ -20,8 +28,23 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/users", authMiddleware, usersRouter);
 app.use("/auth", authRouter);
+
 app.get("/", (req, res) => res.status(200).send("Hahhahahah"));
-app.listen(port, () => {
+io.on("connection", (socket) => {
+  socket.on("create-user", data => {
+   socket._id = data._id
+  })
+  socket.on("transaction", (data) => {
+    const { cardNumber, amount, message, fromUserId } = data;
+    transfer(cardNumber, amount, message, fromUserId, socket, io  )
+  });
+  console.log("a user connected", socket.id);
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
+server.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });
 

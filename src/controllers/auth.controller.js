@@ -7,6 +7,7 @@ const {
   hashPassword,
   comparePassword,
   generateAccessToken,
+  generateRefreshToken
 } = require("../utils/index");
 const authCtrl = {
   checkUser: async (req, res) => {
@@ -124,6 +125,7 @@ const authCtrl = {
         .status(200)
         .json({ success: true, user: newUser, accessToken, refreshToken });
     } catch (error) {
+      console.log(error.message)
       return res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -180,7 +182,7 @@ const authCtrl = {
       const user = await User.findOne({ email });
       if (!user) throw new Error("not_exist");
       if (user.token !== refreshToken) throw new Error("wrong_token");
-      const accessToken = generateAccessToken();
+      const accessToken = generateAccessToken({ id: user._id });
       return res.status(200).json({ success: true, accessToken });
     } catch (error) {
       console.log(error);

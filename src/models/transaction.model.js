@@ -2,16 +2,16 @@ const { Schema, model } = require("mongoose");
 const transactionSchema = Schema(
   {
     fromUser: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
     toUser: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
-    ammount: {
+    amount: {
       type: Number,
       required: [true, "Please enter amount"],
     },
