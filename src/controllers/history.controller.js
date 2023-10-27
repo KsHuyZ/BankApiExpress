@@ -14,7 +14,7 @@ const historyCtrl = {
       ammount,
       balanceAfter,
       transactionType,
-      time
+      time,
     });
     try {
       await history.save();
@@ -22,6 +22,18 @@ const historyCtrl = {
     } catch (error) {
       return { success: false, message: error.message };
     }
+  },
+  getHistoryByUserIdLimit: async (req, res) => {
+    const { id } = req.params;
+    const histories = await History.find({ userId: id })
+      .sort({ _id: -1 })
+      .limit(3);
+    return res.status(200).json({ success: true, histories });
+  },
+  getHistoryByUserId: async (req, res) => {
+    const { id } = req.params;
+    const histories = await History.find({ userId: id }).sort({ _id: -1 });
+    return res.status(200).json({ success: true, histories });
   },
 };
 module.exports = historyCtrl;

@@ -8,7 +8,8 @@ const http = require("http");
 
 const usersRouter = require("./src/routes/users.routes");
 const authRouter = require("./src/routes/auth.routes");
-const {transfer} = require("./src/controllers/transaction.controller");
+const historyRouter = require("./src/routes/history.routes");
+const { transfer } = require("./src/controllers/transaction.controller");
 const authMiddleware = require("./src/middleware/auth.middleware");
 const { connectDB } = require("./src/utils/index");
 
@@ -27,16 +28,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/users", authMiddleware, usersRouter);
+app.use("/history", authMiddleware, historyRouter);
 app.use("/auth", authRouter);
 
 app.get("/", (req, res) => res.status(200).send("Hahhahahah"));
 io.on("connection", (socket) => {
-  socket.on("create-user", data => {
-   socket._id = data._id
-  })
+  socket.on("create-user", (data) => {
+    socket._id = data._id;
+  });
   socket.on("transaction", (data) => {
     const { cardNumber, amount, message, fromUserId } = data;
-    transfer(cardNumber, amount, message, fromUserId, socket, io  )
+    transfer(cardNumber, amount, message, fromUserId, socket, io);
   });
   console.log("a user connected", socket.id);
   socket.on("disconnect", () => {
