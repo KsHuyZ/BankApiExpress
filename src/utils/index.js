@@ -83,7 +83,7 @@ exports.comparePassword = (password, hashPassword) => {
   return bcrypt.compareSync(password, hashPassword);
 };
 exports.generateAccessToken = (user) => {
-  const token = jwt.sign(user, jwtSecret, { expiresIn: 60 * 3 });
+  const token = jwt.sign(user, jwtSecret, { expiresIn: 60 * 10 });
   return token;
 };
 exports.generateRefreshToken = (user) => {
@@ -108,5 +108,5 @@ exports.decodeTokenWithExp = (token) => {
   }
 };
 exports.getCurrentTime = () => {
-  dayjs().format(" 'HH:MM' - YYYY/MM/DD");
+ return dayjs().format("HH:mm DD/MM/YYYY");
 };

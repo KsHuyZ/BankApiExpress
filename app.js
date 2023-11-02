@@ -9,6 +9,7 @@ const http = require("http");
 const usersRouter = require("./src/routes/users.routes");
 const authRouter = require("./src/routes/auth.routes");
 const historyRouter = require("./src/routes/history.routes");
+const notifiRouter = require("./src/routes/notifi.routes");
 const { transfer } = require("./src/controllers/transaction.controller");
 const authMiddleware = require("./src/middleware/auth.middleware");
 const { connectDB } = require("./src/utils/index");
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/users", authMiddleware, usersRouter);
 app.use("/history", authMiddleware, historyRouter);
+app.use("/notifi", notifiRouter);
 app.use("/auth", authRouter);
 
 app.get("/", (req, res) => res.status(200).send("Hahhahahah"));

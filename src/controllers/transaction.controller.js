@@ -3,6 +3,8 @@ const Transaction = require("../models/transaction.model");
 const { createHistory } = require("./history.controller");
 const { transactionType } = require("../constant/index");
 const mongoose = require("mongoose");
+const { getCurrentTime } = require("../utils");
+const { createNotifi } = require("./notification.controller");
 const { RECEIVED, SEND } = transactionType;
 
 const transactionCtrl = {
@@ -36,31 +38,45 @@ const transactionCtrl = {
         const resultHis1 = await createHistory(
           resultTrans.id,
           fromUserId,
-          amount,
           fromUser.balance,
           SEND,
           time
         );
+        console.log('Error from Notif1', resultHis1)
+        const resultNoti1 = await createNotifi(
+          resultHis1.history._id,
+          fromUserId
+        );
+        if (!resultNoti1.success) throw new Error(resultNoti1.message);
         if (!resultHis1.success) throw new Error(resultHis1.message);
+        console.log('Error from Notif2')
         const resultHis2 = await createHistory(
           resultTrans.id,
           receivedUser._id,
-          amount,
           receivedUser.balance,
           RECEIVED,
           time
         );
-        if (!resultHis2.success) throw new Error(resultHis1.message);
+        const resultNoti2 = await createNotifi(
+          resultHis2.history._id.toString(),
+          receivedUser._id.toString()
+        );
+        if (!resultNoti2.success) throw new Error(resultNoti2.message);
+        if (!resultHis2.success) throw new Error(resultHis2.message);
         socket.emit("update_balance", {
           newBalance: fromUser.balance,
+          toUser: `${receivedUser.firstName} ${receivedUser.lastName}`,
           success: true,
           amount,
-          time
+          time,
         });
-        io.to(receivedUser._id.toString()).emit(
-          "receive_amount",
-          receivedUser.balance
-        );
+        socket.emit("new_noti", resultNoti1.notification);
+        io.to(receivedUser._id.toString()).emit("receive_amount", {
+          newBalance: receivedUser.balance,
+          newHistory: resultHis2.history,
+          notification: resultNoti1.notification,
+        });
+        io.to(receivedUser._id.toString()).emit("new_noti", resultNoti2.notification);
       });
       return { success: true };
     } catch (error) {

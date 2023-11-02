@@ -15,15 +15,10 @@ const transactionSchema = Schema(
       ref: "user",
       required: true,
     },
-    ammount: {
-      type: Number,
-      required: [true, "Please enter amount"],
-    },
     balanceAfter: {
       type: Number,
       required: true,
     },
-    // enum: received/sent
     transactionType: {
       type: String,
       enum: [RECEIVED, SEND],
