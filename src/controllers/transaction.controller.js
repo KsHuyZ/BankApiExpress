@@ -74,7 +74,8 @@ const transactionCtrl = {
         io.to(receivedUser._id.toString()).emit("receive_amount", {
           newBalance: receivedUser.balance,
           newHistory: resultHis2.history,
-          notification: resultNoti1.notification,
+          fromUser: `${fromUser.firstName} ${fromUser.lastName}`,
+          amount,
         });
         io.to(receivedUser._id.toString()).emit("new_noti", resultNoti2.notification);
       });

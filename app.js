@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/users", authMiddleware, usersRouter);
 app.use("/history", authMiddleware, historyRouter);
-app.use("/notifi", notifiRouter);
+app.use("/notifi", authMiddleware, notifiRouter);
 app.use("/auth", authRouter);
 
 app.get("/", (req, res) => res.status(200).send("Hahhahahah"));

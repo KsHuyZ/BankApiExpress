@@ -15,6 +15,9 @@ const notiCtrl = {
         path: "historyId",
         populate: {
           path: "transactionId",
+          populate: {
+            path: "toUser fromUser",
+          },
         },
       });
 
