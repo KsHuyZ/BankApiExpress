@@ -13,6 +13,7 @@ const notifiRouter = require("./src/routes/notifi.routes");
 const { transfer } = require("./src/controllers/transaction.controller");
 const authMiddleware = require("./src/middleware/auth.middleware");
 const { connectDB } = require("./src/utils/index");
+const { addUser, removeUser } = require("./src/data/user.socket");
 
 const app = express();
 const server = http.createServer(app);
@@ -36,6 +37,7 @@ app.use("/auth", authRouter);
 app.get("/", (req, res) => res.status(200).send("Hahhahahah"));
 io.on("connection", (socket) => {
   socket.on("create-user", (data) => {
+    addUser({ id: socket.id, _id: data._id });
     socket._id = data._id;
   });
   socket.on("transaction", (data) => {
@@ -44,6 +46,7 @@ io.on("connection", (socket) => {
   });
   console.log("a user connected", socket.id);
   socket.on("disconnect", () => {
+    removeUser(socket.id);
     console.log("user disconnected");
   });
 });

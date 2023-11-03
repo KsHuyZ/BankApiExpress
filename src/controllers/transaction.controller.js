@@ -5,12 +5,14 @@ const { transactionType } = require("../constant/index");
 const mongoose = require("mongoose");
 const { getCurrentTime } = require("../utils");
 const { createNotifi } = require("./notification.controller");
+const { getUser } = require("../data/user.socket");
 const { RECEIVED, SEND } = transactionType;
 
 const transactionCtrl = {
   transfer: async (cardNumber, amount, message, fromUserId, socket, io) => {
     const session = await mongoose.startSession();
     if (!cardNumber || !amount || !fromUserId) throw new Error("set_all_field");
+    if (amount <= 0) throw new Error("amount_bigger");
     try {
       await session.withTransaction(async () => {
         const fromUser = await User.findOne({ _id: fromUserId }).session(
@@ -42,14 +44,14 @@ const transactionCtrl = {
           SEND,
           time
         );
-        console.log('Error from Notif1', resultHis1)
+        console.log("Error from Notif1", resultHis1);
         const resultNoti1 = await createNotifi(
           resultHis1.history._id,
           fromUserId
         );
         if (!resultNoti1.success) throw new Error(resultNoti1.message);
         if (!resultHis1.success) throw new Error(resultHis1.message);
-        console.log('Error from Notif2')
+        console.log("Error from Notif2");
         const resultHis2 = await createHistory(
           resultTrans.id,
           receivedUser._id,
@@ -71,13 +73,14 @@ const transactionCtrl = {
           time,
         });
         socket.emit("new_noti", resultNoti1.notification);
-        io.to(receivedUser._id.toString()).emit("receive_amount", {
+        const user = getUser(receivedUser._id.toString());
+        io.to(user.id).emit("receive_amount", {
           newBalance: receivedUser.balance,
           newHistory: resultHis2.history,
           fromUser: `${fromUser.firstName} ${fromUser.lastName}`,
           amount,
         });
-        io.to(receivedUser._id.toString()).emit("new_noti", resultNoti2.notification);
+        io.to(user.id).emit("new_noti", resultNoti2.notification);
       });
       return { success: true };
     } catch (error) {
