@@ -1,4 +1,4 @@
-const {otpForm} = require('../constant/index')
+const { otpForm } = require("../constant/index");
 const User = require("../models/users.model");
 const {
   generateRandomNumber,
@@ -7,7 +7,7 @@ const {
   hashPassword,
   comparePassword,
   generateAccessToken,
-  generateRefreshToken
+  generateRefreshToken,
 } = require("../utils/index");
 const authCtrl = {
   checkUser: async (req, res) => {
@@ -62,14 +62,16 @@ const authCtrl = {
         user: newUser,
       });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.status(400).json({ success: false, message: error.message });
     }
   },
   checkOTP: async (req, res) => {
     const { email, otp: otpClient } = req.body;
+    console.log(email, otpClient)
     try {
       const user = await User.findOne({ email });
+      if (!user) throw new Error("not_exist");
       const currentTime = new Date();
       const otp = user.otp;
       const { otpCode, created_at: createdAt } = otp;
@@ -83,7 +85,7 @@ const authCtrl = {
       await user.save();
       return res.status(200).json({ success: true });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -126,7 +128,7 @@ const authCtrl = {
         .status(200)
         .json({ success: true, user: newUser, accessToken, refreshToken });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -157,7 +159,7 @@ const authCtrl = {
         refreshToken: user.token,
       });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -175,7 +177,7 @@ const authCtrl = {
       sendMail(email, `Welcome to Bank App`, otpForm(otpCode));
       return res.status(200).json({ success: true });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return res.status(400).json({ success: false, message: error.message });
     }
   },

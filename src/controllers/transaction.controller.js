@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const { getCurrentTime } = require("../utils");
 const { createNotifi } = require("./notification.controller");
 const { getUser } = require("../data/user.socket");
+require("dayjs/locale/vi")
 const { RECEIVED, SEND } = transactionType;
 
 const transactionCtrl = {

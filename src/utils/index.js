@@ -5,7 +5,8 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dayjs = require("dayjs");
-require("dayjs/locale/vi")
+const vi = require('dayjs/locale/vi'); 
+dayjs.locale(vi);
 const jwtSecret = process.env.JWT_SECRET;
 
 exports.generateRandomNumber = (numDigits) => {
