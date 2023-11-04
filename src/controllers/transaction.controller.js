@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const { getCurrentTime } = require("../utils");
 const { createNotifi } = require("./notification.controller");
 const { getUser } = require("../data/user.socket");
-require("dayjs/locale/vi")
+require("dayjs/locale/vi");
 const { RECEIVED, SEND } = transactionType;
 
 const transactionCtrl = {
@@ -38,6 +38,7 @@ const transactionCtrl = {
           time
         );
         if (!resultTrans.success) throw new Error(resultTrans.message);
+        console.log(resultTrans);
         const resultHis1 = await createHistory(
           resultTrans.id,
           fromUserId,
@@ -45,14 +46,14 @@ const transactionCtrl = {
           SEND,
           time
         );
-        console.log("Error from Notif1", resultHis1);
+        console.log(resultHis1);
         const resultNoti1 = await createNotifi(
-          resultHis1.history._id,
+          resultHis1.history._id.toString(),
           fromUserId
         );
+        console.log(resultNoti1);
         if (!resultNoti1.success) throw new Error(resultNoti1.message);
         if (!resultHis1.success) throw new Error(resultHis1.message);
-        console.log("Error from Notif2");
         const resultHis2 = await createHistory(
           resultTrans.id,
           receivedUser._id,
@@ -60,10 +61,12 @@ const transactionCtrl = {
           RECEIVED,
           time
         );
+        console.log(resultHis2);
         const resultNoti2 = await createNotifi(
           resultHis2.history._id.toString(),
           receivedUser._id.toString()
         );
+        console.log(resultHis2);
         if (!resultNoti2.success) throw new Error(resultNoti2.message);
         if (!resultHis2.success) throw new Error(resultHis2.message);
         socket.emit("update_balance", {
@@ -75,13 +78,15 @@ const transactionCtrl = {
         });
         socket.emit("new_noti", resultNoti1.notification);
         const user = getUser(receivedUser._id.toString());
-        io.to(user.id).emit("receive_amount", {
-          newBalance: receivedUser.balance,
-          newHistory: resultHis2.history,
-          fromUser: `${fromUser.firstName} ${fromUser.lastName}`,
-          amount,
-        });
-        io.to(user.id).emit("new_noti", resultNoti2.notification);
+        if(user) {
+          io.to(user.id).emit("receive_amount", {
+            newBalance: receivedUser.balance,
+            newHistory: resultHis2.history,
+            fromUser: `${fromUser.firstName} ${fromUser.lastName}`,
+            amount,
+          });
+          io.to(user.id).emit("new_noti", resultNoti2.notification);
+        }
       });
       return { success: true };
     } catch (error) {
@@ -107,7 +112,7 @@ const transactionCtrl = {
       await transaction.save();
       return { success: true, id: transaction._id };
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       return { success: false, message: error.message };
     }
   },
