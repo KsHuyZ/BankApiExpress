@@ -15,6 +15,7 @@ const authCtrl = {
     try {
       const user = await User.findOne({ email });
       if (!user) {
+        const cardNumber = generateRandomNumber(16);
         const otpCode = generateRandomNumber(4);
         const newUser = new User({
           email,
@@ -22,6 +23,7 @@ const authCtrl = {
             otpCode,
             created_at: new Date(),
           },
+          cardNumber
         });
         newUser.save();
         sendMail(email, `Welcome to Bank App`, otpForm(otpCode));
@@ -97,8 +99,15 @@ const authCtrl = {
       const user = await User.findOne({ email });
       if (!user) throw new Error("not_exist");
       if (!user.isVerified) throw new Error("not_verified");
-      const number = generateRandomNumber(16);
-      user.cardNumber = number;
+      let cardNumber = generateRandomNumber(16);;
+      while (!cardNumber) {
+        const number = generateRandomNumber(16);
+        console.log(number)
+        const userCard = await User.findOne({ cardNumber: number });
+        if (!userCard) {
+          cardNumber = number;
+        }
+      }
       const accessToken = generateAccessToken({ id: user._id });
       const refreshToken = generateRefreshToken({ id: user._id });
       user.firstName = firstName;

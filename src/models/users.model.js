@@ -30,7 +30,7 @@ const userModel = Schema(
     },
     cardNumber: {
       type: Number,
-      unique: true
+      unique: false,
     },
     isVerified: {
       type: Boolean,
