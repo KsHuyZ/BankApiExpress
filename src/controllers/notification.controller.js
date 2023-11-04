@@ -23,6 +23,7 @@ const notiCtrl = {
 
       return { success: true, notification: notifi };
     } catch (error) {
+      console.log(error.message)
       return { success: false, message: error.message };
     }
   },

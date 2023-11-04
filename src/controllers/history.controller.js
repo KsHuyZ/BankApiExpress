@@ -18,6 +18,7 @@ const historyCtrl = {
       await history.save();
       return { success: true, history };
     } catch (error) {
+      console.log(error.message)
       return { success: false, message: error.message };
     }
   },

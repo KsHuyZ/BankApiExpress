@@ -106,6 +106,7 @@ const transactionCtrl = {
       await transaction.save();
       return { success: true, id: transaction._id };
     } catch (error) {
+      console.log(error.message)
       return { success: false, message: error.message };
     }
   },

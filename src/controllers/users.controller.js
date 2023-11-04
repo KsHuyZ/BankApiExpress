@@ -25,6 +25,7 @@ const userCtrl = {
       );
       return res.status(200).json({ success: true });
     } catch (error) {
+      console.log(error.message)
       return res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -41,6 +42,7 @@ const userCtrl = {
       await user.save();
       return res.status(200).json({ success: true });
     } catch (error) {
+      console.log(error.message)
       return res.status(400).json({ success: false, message: error.message });
     }
   },

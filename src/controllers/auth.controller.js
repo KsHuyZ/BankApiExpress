@@ -83,6 +83,7 @@ const authCtrl = {
       await user.save();
       return res.status(200).json({ success: true });
     } catch (error) {
+      console.log(error.message)
       return res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -156,6 +157,7 @@ const authCtrl = {
         refreshToken: user.token,
       });
     } catch (error) {
+      console.log(error.message)
       return res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -173,6 +175,7 @@ const authCtrl = {
       sendMail(email, `Welcome to Bank App`, otpForm(otpCode));
       return res.status(200).json({ success: true });
     } catch (error) {
+      console.log(error.message)
       return res.status(400).json({ success: false, message: error.message });
     }
   },
