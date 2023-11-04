@@ -97,16 +97,8 @@ const authCtrl = {
       const user = await User.findOne({ email });
       if (!user) throw new Error("not_exist");
       if (!user.isVerified) throw new Error("not_verified");
-      let cardNumber;
-      while (!cardNumber) {
-        const number = generateRandomNumber(16);
-        const userCard = await User.findOne({ cardNumber: number });
-        if (!userCard) {
-          cardNumber = number;
-          break;
-        }
-        continue;
-      }
+      const number = generateRandomNumber(16);
+      user.cardNumber = number;
       const accessToken = generateAccessToken({ id: user._id });
       const refreshToken = generateRefreshToken({ id: user._id });
       user.firstName = firstName;
