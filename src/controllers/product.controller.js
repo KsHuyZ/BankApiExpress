@@ -17,9 +17,10 @@ const productCtrl = {
     return res.status(200).json({ product });
   },
   update: async (req, res) => {
-    const { name, type, price, id } = req.body;
+    const { name, type, price, _id } = req.body;
+    console.log({ name, type, price });
     const product = await Product.findOneAndUpdate(
-      { _id: id },
+      { _id },
       { name, type, price },
       { new: true }
     );
