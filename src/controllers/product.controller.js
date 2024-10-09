@@ -19,7 +19,6 @@ const productCtrl = {
   update: async (req, res) => {
     const { name, type, price, id } = req.body;
     const product = await Product.findByIdAndUpdate(id, { name, type, price });
-    await product.save();
     return res.status(200).json({ product });
   },
   deleteProduct: async (req, res) => {
