@@ -10,6 +10,7 @@ const usersRouter = require("./src/routes/users.routes");
 const authRouter = require("./src/routes/auth.routes");
 const historyRouter = require("./src/routes/history.routes");
 const notifiRouter = require("./src/routes/notifi.routes");
+const productRouter = require("./src/routes/product.routes");
 const { transfer } = require("./src/controllers/transaction.controller");
 const authMiddleware = require("./src/middleware/auth.middleware");
 const { connectDB } = require("./src/utils/index");
@@ -24,7 +25,7 @@ const io = new Server(server, {
 app.use(cors());
 app.options("*", cors());
 app.use(morgan("tiny"));
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -33,6 +34,7 @@ app.use("/users", authMiddleware, usersRouter);
 app.use("/history", authMiddleware, historyRouter);
 app.use("/notifi", authMiddleware, notifiRouter);
 app.use("/auth", authRouter);
+app.use("/product", productRouter);
 
 app.get("/", (req, res) => res.status(200).send("Hahhahahah"));
 io.on("connection", (socket) => {
