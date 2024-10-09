@@ -18,7 +18,11 @@ const productCtrl = {
   },
   update: async (req, res) => {
     const { name, type, price, id } = req.body;
-    const product = await Product.findByIdAndUpdate(id, { name, type, price });
+    const product = await Product.findOneAndUpdate(
+      { _id: id },
+      { name, type, price },
+      { new: true }
+    );
     return res.status(200).json({ product });
   },
   deleteProduct: async (req, res) => {
