@@ -7,9 +7,7 @@ const productCtrl = {
   },
   create: async (req, res) => {
     const data = req.body;
-    console.log(data);
-    const { name, type, price } = data;
-    const product = new Product();
+    const product = new Product(data);
     await product.save();
     return res.status(200).json({ product });
   },
