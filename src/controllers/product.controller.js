@@ -6,8 +6,10 @@ const productCtrl = {
     return res.status(200).json({ products });
   },
   create: async (req, res) => {
-    const { name, type, price } = req.body;
-    const product = new Product(name, type, price);
+    const data = req.body;
+    console.log(data);
+    const { name, type, price } = data;
+    const product = new Product();
     await product.save();
     return res.status(200).json({ product });
   },
