@@ -27,7 +27,7 @@ const productCtrl = {
     return res.status(200).json({ product });
   },
   deleteProduct: async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
     await Product.findByIdAndDelete(id);
     return res.status(200).json({ success: true });
   },

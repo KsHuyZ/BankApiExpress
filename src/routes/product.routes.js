@@ -11,6 +11,6 @@ router.get("/", findAll);
 router.get("/:id", findById);
 router.post("/", create);
 router.put("/", update);
-router.delete("/", deleteProduct);
+router.delete("/:id", deleteProduct);
 
 module.exports = router;
